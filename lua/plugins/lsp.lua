@@ -13,6 +13,10 @@ return {
 
     -- Allows extra capabilities provided by nvim-cmp
     'hrsh7th/cmp-nvim-lsp',
+
+    'hrsh7th/nvim-cmp',
+
+    { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } },
   },
   config = function()
     -- Brief aside: **What is LSP?**
@@ -94,6 +98,8 @@ return {
         --  For example, in C this would take you to the header.
         map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+        vim.diagnostic.open_float(nil, { focusable = false })
+
         -- The following two autocommands are used to highlight references of the
         -- word under your cursor when your cursor rests there for a little while.
         --    See `:help CursorHold` for information about when this is executed
@@ -120,6 +126,25 @@ return {
               vim.lsp.buf.clear_references()
               vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
             end,
+          })
+
+          -- Diagnostics - show signs (icons) in the gutter (left of the line number)
+          vim.fn.sign_define("LspDiagnosticsSignError", { text = "", texthl = "LspDiagnosticsDefaultError", linehl = "", numhl = "" })
+          vim.fn.sign_define("LspDiagnosticsSignWarning", { text = "", texthl = "LspDiagnosticsDefaultWarning", linehl = "", numhl = "" })
+          vim.fn.sign_define("LspDiagnosticsSignInformation", { text = "", texthl = "LspDiagnosticsDefaultInformation", linehl = "", numhl = "" })
+          vim.fn.sign_define("LspDiagnosticsSignHint", { text = "", texthl = "LspDiagnosticsDefaultHint", linehl = "", numhl = "" })
+
+          -- Show virtual text inline with the code (errors under the code)
+          vim.diagnostic.config({
+            virtual_text = {
+              prefix = '', -- Set a prefix (optional)
+            },
+            signs = true,   -- Enable signs in the gutter
+            update_in_insert = true, -- Update diagnostics while typing
+            float = {
+              border = 'rounded', -- Floating window borders
+              source = 'always',  -- Show the source of the diagnostic
+            },
           })
         end
 
